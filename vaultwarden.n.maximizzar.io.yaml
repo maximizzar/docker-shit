@@ -1,0 +1,36 @@
+version: '3.5'
+
+services:
+  vaultwarden:
+    # port: 80
+    container_name: 'vaultwarden'
+    environment:
+      ADMIN_TOKEN: ''
+      SMTP_HOST: ''
+      SMTP_PORT: 587
+      SMTP_SECURITY: 'starttls'
+      SMTP_USERNAME: ''
+      SMTP_PASSWORD: ''
+      SMTP_AUTH_MECHANISM: 'Login'
+    image: 'registry.ipv6.docker.com/vaultwarden/server:latest'
+    network_mode: 'host'
+    restart: 'unless-stopped'
+    volumes:
+      - '/opt/:/data/'
+  watchtower:
+    container_name: 'watchtower'
+    environment:
+      TZ: 'Etc/UTC'
+      WATCHTOWER_CLEANUP: true
+      WATCHTOWER_REMOVE_VOLUMES: false
+      WATCHTOWER_INCLUDE_RESTARTING: true
+      WATCHTOWER_INCLUDE_STOPPED: true
+      WATCHTOWER_REVIVE_STOPPED: true
+      WATCHTOWER_POLL_INTERVAL: 86400
+      WATCHTOWER_TIMEOUT: 16
+    image: 'registry.ipv6.docker.com/containrrr/watchtower:latest'
+    network_mode: 'host'
+    restart: 'unless-stopped'
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+
