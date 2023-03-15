@@ -1,0 +1,66 @@
+version: "3.5"
+
+services:
+  mail:
+    container_name: 'mail.plausible'
+    image: 'registry.ipv6.docker.com/bytemark/smtp:latest'
+    network_mode: 'host'
+    restart: 'unless-stopped'
+  plausible_db:
+    container_name: 'postgres.plausible'
+    environment:
+      - 'POSTGRES_PASSWORD=postgres'
+    image: 'registry.ipv6.docker.com/postgres:14-alpine'
+    network_mode: 'host'
+    restart: 'unless-stopped'
+    volumes:
+      - 'db-data:/var/lib/postgresql/data'
+  plausible_events_db:
+    container_name: 'clickhouse.plausible'
+    image: 'registry.ipv6.docker.com/clickhouse/clickhouse-server:22.6-alpine'
+    restart: 'unless-stopped'
+    volumes:
+      - 'event-data:/var/lib/clickhouse'
+      - './clickhouse/clickhouse-config.xml:/etc/clickhouse-server/config.d/logging.xml:ro'
+      - './clickhouse/clickhouse-user-config.xml:/etc/clickhouse-server/users.d/logging.xml:ro'
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+  plausible:
+    command: sh -c "sleep 10 && /entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh run"
+    container_name: 'plausible'
+    depends_on:
+      - 'plausible_db'
+      - 'plausible_events_db'
+      - 'mail'
+    env_file:
+      - 'plausible-conf.env'
+    image: 'registry.ipv6.docker.com/plausible/analytics:latest'
+    network_mode: 'host'
+    restart: 'unless-stopped'
+  watchtower:
+    container_name: 'watchtower'
+    environment:
+      TZ: 'Etc/UTC'
+      WATCHTOWER_CLEANUP: true
+      WATCHTOWER_REMOVE_VOLUMES: false
+      WATCHTOWER_INCLUDE_RESTARTING: true
+      WATCHTOWER_INCLUDE_STOPPED: true
+      WATCHTOWER_REVIVE_STOPPED: true
+      WATCHTOWER_POLL_INTERVAL: 86400
+      WATCHTOWER_TIMEOUT: 16
+    image: 'registry.ipv6.docker.com/containrrr/watchtower:latest'
+    network_mode: 'host'
+    restart: 'unless-stopped'
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+
+volumes:
+  db-data:
+    driver: local
+  event-data:
+    driver: local
+  geoip:
+    driver: local
+
