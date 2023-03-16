@@ -1,0 +1,28 @@
+version: "3.5"
+# prometheus-exporter: 8080
+# prometheus: 9090
+
+services:
+  snowflake-proxy:
+    command: [ "-verbose", "-log", "/shared/docker_snowflake.log" ]
+    container_name: 'snowflake-proxy'
+    image: 'registry.ipv6.docker.com/thetorproject/snowflake-proxy:latest'
+    network_mode: 'host'
+    restart: 'unless-stopped'
+    volumes:
+      - '.:/shared:rw'
+  prometheus-exporter:
+    container_name: 'snowflake-prometheus-exporter'
+    image: 'ghcr.io/mrdrache333/snowflake-prometheus-exporter'
+    network_mode: 'host'
+    restart: 'unless-stopped'
+    volumes:
+      - './docker_snowflake.log:/docker_snowflake.log:ro'
+  prometheus:
+    container_name: 'prometheus'
+    image: 'registry.ipv6.docker.com/prom/prometheus'
+    network_mode: 'host'
+    restart: 'unless-stopped'
+    volumes:
+      - './prometheus.yml:/etc/prometheus/prometheus.yml'
+      - '/opt/prometheus/:/prometheus'
