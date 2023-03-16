@@ -1,0 +1,17 @@
+version: "3.5"
+services:
+  upsnap:
+    container_name: 'upsnap'
+    environment:
+      TZ: Europe/Berlin
+      UPSNAP_INTERVAL: 10
+      UPSNAP_SCAN_RANGE: '192.168.0.0/16'
+      UPSNAP_WEBSITE_TITLE: upsnap
+    healthcheck:
+      test: 'curl -fs "http://localhost:5000/api/health" || exit 1'
+      interval: '10s'
+    image: 'ghcr.io/seriousm4x/upsnap:3'
+    network_mode: 'host'
+    restart: 'unless-stopped'
+    volumes:
+      - '/opt/:/app/pb_data'
