@@ -1,4 +1,4 @@
-version: '3.5'
+version: '3.8'
 
 services:
   vaultwarden:
@@ -12,11 +12,14 @@ services:
       SMTP_USERNAME: ''
       SMTP_PASSWORD: ''
       SMTP_AUTH_MECHANISM: 'Login'
+      WEBSOCKET_ENABLED: true
     image: 'registry.ipv6.docker.com/vaultwarden/server:latest'
-    network_mode: 'host'
+    network_mode: 'bridge'
+    ports:
+      - '127.0.0.1:8080:80'
     restart: 'unless-stopped'
     volumes:
-      - '/opt/:/data/'
+      - '/opt/vaultwarden:/data/'
   watchtower:
     container_name: 'watchtower'
     environment:
@@ -29,7 +32,7 @@ services:
       WATCHTOWER_POLL_INTERVAL: 86400
       WATCHTOWER_TIMEOUT: 16
     image: 'registry.ipv6.docker.com/containrrr/watchtower:latest'
-    network_mode: 'host'
+    network_mode: 'bridge'
     restart: 'unless-stopped'
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
