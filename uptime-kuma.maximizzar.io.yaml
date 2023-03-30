@@ -1,7 +1,4 @@
-version: '3.3'
-# https://github.com/louislam/uptime-kuma
-# Port = 3001 ; 80
-
+version: '3.5'
 services:
   uptime-kuma:
     container_name: 'uptime-kuma'
@@ -10,7 +7,7 @@ services:
       - 'PGID=0'
       - 'TZ=Etc/UTC'
     image: 'registry.ipv6.docker.com/louislam/uptime-kuma:latest'
-    network_mode: 'host'
+    network_mode: 'host' #port = 3001
     restart: 'unless-stopped'
     volumes:
       - '/opt/uptime-kuma:/app/data'
@@ -19,7 +16,10 @@ services:
     environment:
       GOTIFY_DEFAULTUSER_PASS: ''
     image: 'registry.ipv6.docker.com/gotify/server:latest'
-    network_mode: 'host'
+    network_mode: 'bridge'
+    restart: 'unless-stopped'
+    ports:
+      - '127.0.0.1:80:80'
     volumes:
       - '/opt/gotify:/app/data'
   watchtower:
