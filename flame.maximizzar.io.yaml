@@ -1,22 +1,19 @@
 version: '3.5'
-# Git repository used for the deployment below.
-# https://github.com/pawelmalak/flame
-
-# Port = 5005
-
 services:
   flame:
     container_name: 'flame'
     environment:
       PASSWORD: 'flame_password'
-      PASSWORD_FILE: '/run/secrets/password' # optional but required for (1)
+      PASSWORD_FILE: '/run/secrets/password'
     image: 'registry.ipv6.docker.com/pawelmalak/flame:latest'
-    network_mode: 'host'
+    network_mode: 'bridge'
+    ports:
+      - '127.0.0.1:8080:5005'
     restart: 'unless-stopped'
     secrets:
-      - 'password' # optional but required for (1)
+      - 'password'
     volumes:
-      - '/opt/:/app/data'
+      - '/opt/flame/:/app/data'
   watchtower:
     container_name: 'watchtower'
     environment:
@@ -29,10 +26,10 @@ services:
       WATCHTOWER_POLL_INTERVAL: 86400
       WATCHTOWER_TIMEOUT: 16
     image: 'registry.ipv6.docker.com/containrrr/watchtower:latest'
-    network_mode: 'host'
+    network_mode: 'bridge'
     restart: 'unless-stopped'
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
 secrets:
   password:
-    file: '/opt/flame'
+    file: '/opt/flame_key'
