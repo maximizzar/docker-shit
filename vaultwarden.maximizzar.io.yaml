@@ -16,7 +16,7 @@ services:
     network_mode: 'bridge'
     ports:
       - '127.0.0.1:8080:80'
-      - '127.0.0.1:3012:3012'
+      - '3012:3012'
     restart: 'unless-stopped'
     volumes:
       - '/opt/vaultwarden:/data/'
