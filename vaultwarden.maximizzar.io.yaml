@@ -2,7 +2,6 @@ version: '3.8'
 
 services:
   vaultwarden:
-    # port: 80
     container_name: 'vaultwarden'
     environment:
       ADMIN_TOKEN: ''
@@ -17,19 +16,20 @@ services:
     network_mode: 'bridge'
     ports:
       - '127.0.0.1:8080:80'
+      - '127.0.0.1:3012:3012'
     restart: 'unless-stopped'
     volumes:
       - '/opt/vaultwarden:/data/'
   watchtower:
     container_name: 'watchtower'
     environment:
-      TZ: 'Etc/UTC'
+      TZ: 'UTC'
       WATCHTOWER_CLEANUP: true
       WATCHTOWER_REMOVE_VOLUMES: false
       WATCHTOWER_INCLUDE_RESTARTING: true
       WATCHTOWER_INCLUDE_STOPPED: true
       WATCHTOWER_REVIVE_STOPPED: true
-      WATCHTOWER_POLL_INTERVAL: 86400
+      WATCHTOWER_POLL_SCHEDULE: '0 30 3 * * *'
       WATCHTOWER_TIMEOUT: 16
     image: 'registry.ipv6.docker.com/containrrr/watchtower:latest'
     network_mode: 'bridge'

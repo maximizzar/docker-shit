@@ -1,11 +1,12 @@
-version: '3.5'
+version: '3.8'
+
 services:
   uptime-kuma:
     container_name: 'uptime-kuma'
     environment:
       - 'PUID=0'
       - 'PGID=0'
-      - 'TZ=Etc/UTC'
+      - 'TZ=UTC'
     image: 'registry.ipv6.docker.com/louislam/uptime-kuma:latest'
     network_mode: 'host' #port = 3001
     restart: 'unless-stopped'
@@ -13,25 +14,23 @@ services:
       - '/opt/uptime-kuma:/app/data'
   gotify:
     container_name: 'gotify'
-    environment:
-      GOTIFY_DEFAULTUSER_PASS: ''
     image: 'registry.ipv6.docker.com/gotify/server:latest'
     network_mode: 'bridge'
     restart: 'unless-stopped'
     ports:
-      - '127.0.0.1:80:80'
+      - '127.0.0.1:8080:80'
     volumes:
       - '/opt/gotify:/app/data'
   watchtower:
     container_name: 'watchtower'
     environment:
-      TZ: 'Etc/UTC'
+      TZ: 'UTC'
       WATCHTOWER_CLEANUP: true
       WATCHTOWER_REMOVE_VOLUMES: false
       WATCHTOWER_INCLUDE_RESTARTING: true
       WATCHTOWER_INCLUDE_STOPPED: true
       WATCHTOWER_REVIVE_STOPPED: true
-      WATCHTOWER_POLL_INTERVAL: 86400
+      WATCHTOWER_POLL_SCHEDULE: '0 30 3 * * *'
       WATCHTOWER_TIMEOUT: 16
     image: 'registry.ipv6.docker.com/containrrr/watchtower:latest'
     network_mode: 'host'
