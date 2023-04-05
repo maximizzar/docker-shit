@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  stash:
+    container_name: 'stash'
+    environment:
+      STASH_STASH: '/data/'
+      STASH_GENERATED: '/generated/'
+      STASH_METADATA: '/metadata/'
+      STASH_CACHE: '/cache/'
+      STASH_PORT: 9999
+    image: 'registry.ipv6.docker.com/stashapp/stash:latest'
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "10"
+        max-size: "2m"
+    network_mode: 'host'
+    restart: 'unless-stopped'
+    volumes:
+      - '/etc/localtime:/etc/localtime:ro'
+      - '/opt/config:/root/.stash'
+      - '/mnt/media:/data'
+      - '/opt/metadata:/metadata'
+      - '/opt/cache:/cache'
+      - '/opt/generated:/generated'
+  watchtower:
+    container_name: 'watchtower'
+    environment:
+      TZ: 'UTC'
+      WATCHTOWER_CLEANUP: true
+      WATCHTOWER_REMOVE_VOLUMES: false
+      WATCHTOWER_INCLUDE_RESTARTING: true
+      WATCHTOWER_INCLUDE_STOPPED: true
+      WATCHTOWER_REVIVE_STOPPED: true
+      WATCHTOWER_POLL_SCHEDULE: '0 30 3 * * *'
+      WATCHTOWER_TIMEOUT: 16
+    image: 'registry.ipv6.docker.com/containrrr/watchtower:latest'
+    network_mode: 'host'
+    restart: 'unless-stopped'
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
