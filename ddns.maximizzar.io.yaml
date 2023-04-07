@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  cf_ddnsA1:
+    container_name: 'cf_ddnsA1'
+    environment:
+      API_KEY: ''
+      ZONE: 'maximizzar.io'
+      SUBDOMAIN: ''
+      RRTYPE: 'A'
+      PROXIED: true
+      DELETE_ON_STOP: true
+    image: 'oznu/cloudflare-ddns:latest'
+    network_mode: 'host'
+    restart: 'unless-stopped'
+  cf_ddnsA2:
+    container_name: 'cf_ddnsA2'
+    environment:
+      API_KEY: ''
+      ZONE: 'maximizzar.io'
+      SUBDOMAIN: '*'
+      RRTYPE: 'A'
+      PROXIED: true
+      DELETE_ON_STOP: true
+    image: 'oznu/cloudflare-ddns:latest'
+    network_mode: 'host'
+    restart: 'unless-stopped'
+
+  cf_ddnsAAAA1:
+    container_name: 'cf_ddnsAAAA1'
+    environment:
+      API_KEY: ''
+      ZONE: 'maximizzar.io'
+      SUBDOMAIN: ''
+      RRTYPE: 'AAAA'
+      PROXIED: true
+      DELETE_ON_STOP: true
+    image: 'oznu/cloudflare-ddns:latest'
+    network_mode: 'host'
+    restart: 'unless-stopped'
+  cf_ddnsAAAA2:
+    container_name: 'cf_ddnsAAAA2'
+    environment:
+      API_KEY: ''
+      ZONE: 'maximizzar.io'
+      SUBDOMAIN: '*'
+      RRTYPE: 'AAAA'
+      PROXIED: true
+      DELETE_ON_STOP: true
+    image: 'oznu/cloudflare-ddns:latest'
+    network_mode: 'host'
+    restart: 'unless-stopped'
+
+  watchtower:
+    container_name: 'watchtower'
+    environment:
+      TZ: 'UTC'
+      WATCHTOWER_CLEANUP: true
+      WATCHTOWER_REMOVE_VOLUMES: false
+      WATCHTOWER_INCLUDE_RESTARTING: true
+      WATCHTOWER_INCLUDE_STOPPED: true
+      WATCHTOWER_REVIVE_STOPPED: true
+      WATCHTOWER_POLL_SCHEDULE: '0 30 3 * * *'
+      WATCHTOWER_TIMEOUT: 16
+    image: 'registry.ipv6.docker.com/containrrr/watchtower:latest'
+    network_mode: 'bridge'
+    restart: 'unless-stopped'
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
