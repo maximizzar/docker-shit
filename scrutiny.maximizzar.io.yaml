@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  scrutiny:
+    cap_add:
+      - SYS_RAWIO
+    container_name: 'scrutiny'
+    devices:
+      - '/dev/sda'
+      - '/dev/sdb'
+      - '/dev/sdc'
+      - '/dev/sdd'
+      - '/dev/sde'
+      - '/dev/sdf'
+    image: 'ghcr.io/analogj/scrutiny:master-omnibus'
+    network_mode: 'bridge'
+    ports:
+      - '127.0.0.1:8080:8080' # webapp
+      - '127.0.0.1:8086:8086' # influxDB admin
+    volumes:
+      - '/run/udev:/run/udev:ro'
+      - './config:/opt/scrutiny/config'
+      - './influxdb:/opt/scrutiny/influxdb'
+  watchtower:
+    container_name: 'watchtower'
+    environment:
+      TZ: 'UTC'
+      WATCHTOWER_CLEANUP: true
+      WATCHTOWER_REMOVE_VOLUMES: false
+      WATCHTOWER_INCLUDE_RESTARTING: true
+      WATCHTOWER_INCLUDE_STOPPED: true
+      WATCHTOWER_REVIVE_STOPPED: true
+      WATCHTOWER_POLL_SCHEDULE: '0 30 3 * * *'
+      WATCHTOWER_TIMEOUT: 16
+    image: 'containrrr/watchtower:latest'
+    network_mode: 'bridge'
+    restart: 'unless-stopped'
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
