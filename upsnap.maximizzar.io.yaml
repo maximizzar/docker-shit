@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  upsnap:
+    container_name: 'upsnap'
+    environment:
+      TZ: 'UTC'
+      UPSNAP_INTERVAL: '@every 10s'
+      UPSNAP_SCAN_RANGE: '192.168.2.0/24'
+      UPSNAP_WEBSITE_TITLE: 'upsnap'
+    image: 'ghcr.io/seriousm4x/upsnap:3'
+    network_mode: 'host'
+    restart: 'unless-stopped'
+    volumes:
+      - '/opt/upsnap:/app/pb_data'
+    entrypoint: '/bin/sh -c "./upsnap serve --http 0.0.0.0:8090'
+    # healthcheck:
+    #   test: curl -fs "http://localhost:5000/api/health" || exit 1
+    #   interval: 10s
