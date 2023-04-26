@@ -1,0 +1,31 @@
+version: '3.8'
+
+name: 'dashdot'
+
+networks:
+  proxy_network:
+    external: true
+
+services:
+  dashdot:
+    container_name: 'dashdot'
+    environment:
+      DASHDOT_SHOW_HOST: false
+      DASHDOT_SHOW_DASH_VERSION: 'icon_hover'
+      DASHDOT_CUSTOM_HOST:
+      DASHDOT_ENABLE_CPU_TEMPS: false
+      DASHDOT_USE_IMPERIAL: false
+      DASHDOT_ALWAYS_SHOW_PERCENTAGES: false
+      DASHDOT_PAGE_TITLE: 'dash.'
+      DASHDOT_PORT: 3001
+      DASHDOT_OVERRIDE_NETWORK_INTERFACE_SPEED: 1024
+    hostname: 'dashdot'
+    image: 'registry.ipv6.docker.com/mauricenino/dashdot:latest'
+    networks:
+      - proxy_network
+    ports:
+      - '3001:3001'
+    privileged: true
+    restart: 'unless-stopped'
+    volumes:
+      - '/:/mnt/host:ro'

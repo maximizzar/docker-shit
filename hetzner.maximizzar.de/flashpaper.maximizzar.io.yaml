@@ -1,0 +1,44 @@
+version: "3.8"
+
+name: 'flashpaper'
+
+networks:
+  proxy_network:
+    external: true
+
+services:
+  flashpaper:
+    container_name: 'flashpaper'
+    environment:
+      SITE_TITLE: "FlashPaper :: Self-Destructing Message"
+      RETURN_FULL_URL: true
+      BASE_URL: 'flashpaper.maximizzar.io'
+      MAX_SECRET_LENGTH: 3000
+      ANNOUNCEMENT:
+      MESSAGES_ERROR_SECRET_TOO_LONG: "Input length too long"
+      MESSAGES_SUBMIT_SECRET_HEADER: "Create A Self-Destructing Message"
+      MESSAGES_SUBMIT_SECRET_SUBHEADER: ""
+      MESSAGES_SUBMIT_SECRET_BUTTON: "Encrypt Message"
+      MESSAGES_VIEW_CODE_HEADER: "Self-Destructing URL"
+      MESSAGES_VIEW_CODE_SUBHEADER: "Share this URL via email, chat, or another messaging service. It will self-destruct after being viewed once."
+      MESSAGES_CONFIRM_VIEW_SECRET_HEADER: "View this secret?"
+      MESSAGES_CONFIRM_VIEW_SECRET_BUTTON: "View Secret"
+      MESSAGES_VIEW_SECRET_HEADER: "Self-Destructing Message"
+      MESSAGES_VIEW_SECRET_SUBHEADER: "This message has been destroyed"
+      PRUNE_ENABLED: true
+      PRUNE_MIN_DAYS: 365
+      PRUNE_MAX_DAYS: 730
+    hostname: 'flashpaper'
+    networks:
+      - proxy_network
+    ports:
+      - '8080:80'
+    image: 'ghcr.io/andrewpaglusch/flashpaper:v2'
+    restart: 'unless-stopped'
+    volumes:
+      - 'flashpaper_data:/var/www/html/data'
+
+volumes:
+  flashpaper_data:
+    name: 'flashpaper_data'
+    driver: 'local'

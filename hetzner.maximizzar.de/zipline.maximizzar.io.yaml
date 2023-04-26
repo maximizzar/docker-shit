@@ -1,0 +1,62 @@
+version: '3.8'
+
+name: 'zipline'
+
+networks:
+  proxy_network:
+    external: true
+  backend:
+    external: true
+
+services:
+  postgres:
+    container_name: 'postgres-zipline'
+    environment:
+      TZ: 'UTC'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_DATABASE: 'postgres'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    hostname: 'postgres-zipline'
+    networks:
+      - backend
+    image: 'registry.ipv6.docker.com/library/postgres:15'
+    restart: 'unless-stopped'
+    volumes:
+      - 'postgres_data:/var/lib/postgresql/data'
+
+  zipline:
+    container_name: 'zipline'
+    depends_on:
+      - 'postgres'
+    environment:
+      TZ: 'UTC'
+      CORE_RETURN_HTTPS: false
+      CORE_SECRET: 'changethis'
+      CORE_HOST: '0.0.0.0'
+      CORE_PORT: 3000
+      CORE_DATABASE_URL: 'postgres://postgres:postgres@postgres/postgres'
+      CORE_LOGGER: true
+    hostname: 'zipline'
+    image: 'ghcr.io/diced/zipline'
+    networks:
+      - proxy_network
+      - backend
+    ports:
+      - '3000:3000'
+    restart: 'unless-stopped'
+    volumes:
+      - 'zipline_data:/zipline/uploads'
+      - 'zipline_data:/zipline/public'
+
+volumes:
+  postgres_data:
+    name: 'postgres_data'
+    driver: 'local'
+  zipline_data:
+    name: 'zipline_data'
+    driver: 'local'

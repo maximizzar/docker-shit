@@ -1,0 +1,21 @@
+version: '3.8'
+
+name: 'watchtower'
+
+services:
+  watchtower:
+    container_name: 'watchtower'
+    environment:
+      TZ: 'UTC'
+      WATCHTOWER_CLEANUP: true
+      WATCHTOWER_REMOVE_VOLUMES: false
+      WATCHTOWER_INCLUDE_RESTARTING: true
+      WATCHTOWER_INCLUDE_STOPPED: true
+      WATCHTOWER_REVIVE_STOPPED: true
+      WATCHTOWER_POLL_SCHEDULE: '0 30 3 * * *'
+      WATCHTOWER_TIMEOUT: 16
+    image: 'registry.ipv6.docker.com/containrrr/watchtower:latest'
+    network_mode: 'none'
+    restart: 'unless-stopped'
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
